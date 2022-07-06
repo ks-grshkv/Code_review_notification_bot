@@ -1,29 +1,21 @@
 from http import HTTPStatus
 import time
 import logging
-# from urllib import response
 import requests
 import os
 import telegram.ext
-
-# from telegram import Bot
-# from telegram.ext import Filters, MessageHandler, Updater
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-PRACTICUM_TOKEN = ...
-TELEGRAM_TOKEN = ...
-TELEGRAM_CHAT_ID = ...
-
-practicum_token = os.getenv('PRACTICUM_TOKEN')
-telegram_token = os.getenv('TELEGRAM_TOKEN')
-chat_id = os.getenv('TELEGRAM_CHAT_ID')
+PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 RETRY_TIME = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
-HEADERS = {'Authorization': f'OAuth {practicum_token}'}
+HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
 
 HOMEWORK_STATUSES = {
@@ -34,7 +26,7 @@ HOMEWORK_STATUSES = {
 
 
 def send_message(bot, message):
-    bot.send_message(chat_id, message)
+    bot.send_message(TELEGRAM_CHAT_ID, message)
 
 
 def get_api_answer(current_timestamp):
@@ -73,7 +65,7 @@ def parse_status(homework):
 
 
 def check_tokens():
-    if practicum_token and telegram_token and chat_id:
+    if PRACTICUM_TOKEN and TELEGRAM_TOKEN and TELEGRAM_CHAT_ID:
         return True
     else:
         return False
@@ -82,7 +74,7 @@ def check_tokens():
 def main():
     """Основная логика работы бота."""
 
-    bot = telegram.Bot(token=telegram_token)
+    bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
     prev_status_message = ''
     # new:
