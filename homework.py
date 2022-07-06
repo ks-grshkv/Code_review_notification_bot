@@ -26,6 +26,7 @@ HOMEWORK_STATUSES = {
 
 
 def send_message(bot, message):
+    """Отправляем сообщение."""
     bot.send_message(TELEGRAM_CHAT_ID, message)
 
 
@@ -79,6 +80,7 @@ def main():
     """Основная логика работы бота."""
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
+    prev_status_message = ''
     while True:
         try:
             homeworks = check_response(
