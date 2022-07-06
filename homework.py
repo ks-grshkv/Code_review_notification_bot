@@ -30,6 +30,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(current_timestamp):
+    """Получаем ответ от API."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     try:
@@ -45,6 +46,7 @@ def get_api_answer(current_timestamp):
 
 
 def check_response(response):
+    """Проверяем корректность ответа от API."""
     if not isinstance(response, dict):
         raise TypeError('Response is not dict!')
     if response is None:
@@ -56,6 +58,7 @@ def check_response(response):
 
 
 def parse_status(homework):
+    """Выясняем статус домашки."""
     homework_name = homework.get('homework_name')
     homework_status = homework.get('status')
 
@@ -65,6 +68,7 @@ def parse_status(homework):
 
 
 def check_tokens():
+    """Проверка наличия необходимых переменных."""
     if PRACTICUM_TOKEN and TELEGRAM_TOKEN and TELEGRAM_CHAT_ID:
         return True
     else:
@@ -73,11 +77,8 @@ def check_tokens():
 
 def main():
     """Основная логика работы бота."""
-
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
-    prev_status_message = ''
-    # new:
     while True:
         try:
             homeworks = check_response(
