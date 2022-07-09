@@ -126,7 +126,7 @@ def main():
     while True:
         try:
             homeworks = check_response(
-                get_api_answer(current_timestamp - 10000000)
+                get_api_answer(current_timestamp)
             )
             current_report['homework_name'] = homeworks[0].get('homework_name')
             current_report['output'] = parse_status(homeworks[0])
