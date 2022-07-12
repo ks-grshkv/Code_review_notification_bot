@@ -78,10 +78,9 @@ def check_response(response):
         raise Exception('No homeworks found')
     if 'current_date' not in response:
         raise Exception('current_date key doesnt exist!')
-    if 'homeworks' in response:
-        homeworks = response.get('homeworks')
-    else:
+    if 'homeworks' not in response:
         raise Exception('homework key doesnt exist!')
+    homeworks = response.get('homeworks')
     if not isinstance(homeworks, list):
         raise TypeError('Homeworks is not list!')
     return homeworks
@@ -94,14 +93,10 @@ def parse_status(homework):
     if homework_name is None:
         message = f'Couldnt retrieve homework name! {homework}'
         logger.error(message)
-        # raise Exception(message) -- про это писала в личку,
-        # pytest тестирует домашку без имени
     homework_status = homework.get('status')
     if homework_status not in HOMEWORK_STATUSES:
         message = f'Couldnt parsе {homework_name} status: {homework_status}'
         logger.error(message)
-        # raise Exception(message) -- аналогично, по-хорошему я бы выбросила
-        # эксепшен, но так не проходятся pytest
     verdict = HOMEWORK_STATUSES[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
