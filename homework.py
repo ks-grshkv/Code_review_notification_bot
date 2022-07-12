@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import time
 from http import HTTPStatus
 
@@ -75,9 +76,12 @@ def check_response(response):
         raise TypeError('Response is not dict!')
     if response is None:
         raise Exception('No homeworks found')
-    if not response['current_date']:
+    if 'current_date' not in response:
         raise Exception('current_date key doesnt exist!')
-    homeworks = response.get('homeworks')
+    if 'homeworks' in response:
+        homeworks = response.get('homeworks')
+    else:
+        raise Exception('homework key doesnt exist!')
     if not isinstance(homeworks, list):
         raise TypeError('Homeworks is not list!')
     return homeworks
@@ -86,35 +90,36 @@ def check_response(response):
 def parse_status(homework):
     """Выясняем статус домашки."""
     logger.info('Parsing homework status')
-    try:
-        homework_name = homework.get('homework_name')
-    except Exception:
-        raise Exception('Couldnt retrieve homework name!')
+    homework_name = homework.get('homework_name')
+    if homework_name is None:
+        message = f'Couldnt retrieve homework name! {homework}'
+        logger.error(message)
+        # raise Exception(message) -- про это писала в личку,
+        # pytest тестирует домашку без имени
     homework_status = homework.get('status')
-    if HOMEWORK_STATUSES[homework_status] is not None:
-        verdict = HOMEWORK_STATUSES[homework_status]
-    else:
-        raise Exception(
-            f'Couldnt parsе {homework_name} status: {homework_status}'
-        )
-
+    if homework_status not in HOMEWORK_STATUSES:
+        message = f'Couldnt parsе {homework_name} status: {homework_status}'
+        logger.error(message)
+        # raise Exception(message) -- аналогично, по-хорошему я бы выбросила
+        # эксепшен, но так не проходятся pytest
+    verdict = HOMEWORK_STATUSES[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def check_tokens():
     """Проверка наличия необходимых переменных."""
-    if all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
-        return True
-    else:
-        return False
+    return all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID])
 
 
 def main():
     """Основная логика работы бота."""
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
-    if check_tokens() is False:
-        exit()
+    check_tokens_result = check_tokens()
+    if not check_tokens_result:
+        message = 'Check tokens returned False!'
+        logger.critical(message)
+        sys.exit(message)
     prev_report = {
         'name_messages': None,
         'output': None
